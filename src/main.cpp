@@ -3,7 +3,7 @@
 #include <Geode/modify/RateStarsLayer.hpp>
 #include <Geode/modify/ProfilePage.hpp>
 #include <Geode/modify/LevelInfoLayer.hpp>
-
+#include <Geode/modify/SupportLayer.hpp>
 
 using namespace geode::prelude;
 
@@ -13,6 +13,8 @@ class $modify(LevelInfoLayer) {
 
 		std::vector<BYTE> bytes = { 0x90, 0x90 };
 
+		// IDK exactly how this works but makes the game think ur moderator
+		// Couldn't find a function to hook while the game was loading so this works good enough
 		WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(base::get() + 0x252890), bytes.data(), bytes.size(), nullptr);
 		WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(base::get() + 0x252895), bytes.data(), bytes.size(), nullptr);
 
@@ -23,6 +25,7 @@ class $modify(LevelInfoLayer) {
 	}
 };
 
+
 class $modify(RateStarsLayer) {
 
 	void onRate(CCObject * sender) {
@@ -32,6 +35,18 @@ class $modify(RateStarsLayer) {
 		popup->showSuccessMessage("Rating submitted!");
 	}
 };
+
+
+class $modify(SupportLayer) {
+
+	void onRequestAccess(CCObject * sender) {
+
+		UploadActionPopup* popup = UploadActionPopup::create(nullptr, "");
+		popup->show();
+		popup->showSuccessMessage("Success! Moderator access granted.");
+	}
+};
+
 
 class $modify(ProfilePage) {
 
