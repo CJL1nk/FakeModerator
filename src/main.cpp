@@ -4,6 +4,7 @@
 #include <Geode/modify/ProfilePage.hpp>
 #include <Geode/modify/LevelInfoLayer.hpp>
 #include <Geode/modify/SupportLayer.hpp>
+#include <Geode/modify/GameManager.hpp>
 
 using namespace geode::prelude;
 
@@ -11,17 +12,14 @@ class $modify(LevelInfoLayer) {
 
 	bool init(GJGameLevel * p0, bool p1) {
 
-		std::vector<BYTE> bytes = { 0x90, 0x90 };
+		GameManager* manager = GameManager::sharedState();
 
-		// IDK exactly how this works but makes the game think ur moderator
-		// Couldn't find a function to hook while the game was loading so this works good enough
-		WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(base::get() + 0x252890), bytes.data(), bytes.size(), nullptr);
-		WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(base::get() + 0x252895), bytes.data(), bytes.size(), nullptr);
+		manager->m_hasRP = Mod::get()->getSettingValue<int64_t>("mod-type");
 
-		if (!LevelInfoLayer::init(p0, p1))
-			return false;
+		bool result = LevelInfoLayer::init(p0,p1);
 
-		return true;
+		return result;
+
 	}
 };
 
@@ -30,9 +28,16 @@ class $modify(RateStarsLayer) {
 
 	void onRate(CCObject * sender) {
 
-		UploadActionPopup* popup = UploadActionPopup::create(nullptr, "");
-		popup->show();
-		popup->showSuccessMessage("Rating submitted!");
+		CCLayer* layer = static_cast<CCLayer*>(getChildren()->objectAtIndex(0));
+
+		if (layer->getChildrenCount() == 3) { // prevents it from being shown to the normal star rate
+			UploadActionPopup* popup = UploadActionPopup::create(nullptr, "");
+			popup->show();
+			popup->showSuccessMessage("Rating submitted!");
+		}
+		else {
+			RateStarsLayer::onRate(sender);
+		}
 	}
 };
 
@@ -50,23 +55,32 @@ class $modify(SupportLayer) {
 
 class $modify(ProfilePage) {
 
-	virtual TodoReturn setupPageInfo(gd::string name, char const* c) {
+CCSprite* icon;
 
+	void setupPageInfo(gd::string name, char const* c) {
+
+		ProfilePage::setupPageInfo(name, c);
 
 		if (m_ownProfile) {
 
-			// Thanks for this code Xanii
-			CCSprite* icon;
+			// Thanks for this code Xanii | you're welcome
 
-			icon = CCSprite::create("modBadge.png"_spr);
+			int mod_type = Mod::get()->getSettingValue<int64_t>("mod-type");
 
-			CCNode* first_letter = reinterpret_cast<CCNode*>(m_usernameLabel->getChildren()->objectAtIndex(0));
+			switch(mod_type) {
+				case 1: m_fields->icon = CCSprite::createWithSpriteFrameName("modBadge_01_001.png"); break;
+				case 2: m_fields->icon = CCSprite::createWithSpriteFrameName("modBadge_02_001.png"); break;
+			}
+			
+			if (mod_type > 0) {
+				CCNode* first_letter = reinterpret_cast<CCNode*>(m_usernameLabel->getChildren()->objectAtIndex(0));
 
-			icon->setScale(m_usernameLabel->getScale() + 0.2);
-			icon->setPosition(first_letter->convertToWorldSpace(getPosition()));
-			icon->setPosition({ icon->getPositionX() - 15.f, icon->getPositionY() + 10.f });
+				m_fields->icon->setScale(m_usernameLabel->getScale() + 0.2);
+				m_fields->icon->setPosition(first_letter->convertToWorldSpace(getPosition()));
+				m_fields->icon->setPosition({ m_fields->icon->getPositionX() - 15.f, m_fields->icon->getPositionY() + 10.f });
 
-			static_cast<CCLayer*>(this->getChildren()->objectAtIndex(0))->addChild(icon);
+				static_cast<CCLayer*>(this->getChildren()->objectAtIndex(0))->addChild(m_fields->icon);
+			}
 		}
 	}
 };
