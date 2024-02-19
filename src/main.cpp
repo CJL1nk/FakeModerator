@@ -5,6 +5,7 @@
 #include <Geode/modify/LevelInfoLayer.hpp>
 #include <Geode/modify/SupportLayer.hpp>
 #include <Geode/modify/GameManager.hpp>
+#include <Geode/binding/LoadingCircle.hpp>
 
 using namespace geode::prelude;
 
@@ -20,6 +21,11 @@ class $modify(LevelInfoLayer) {
 
 		return result;
 
+	}
+
+	virtual TodoReturn levelDeleteFailed(int p0)
+	{
+		FLAlertLayer::create("Level Deleted", "The level has been removed from the server.", "Ok")->show();
 	}
 };
 
@@ -55,7 +61,7 @@ class $modify(SupportLayer) {
 
 class $modify(ProfilePage) {
 
-CCSprite* icon;
+	CCSprite* icon;
 
 	void setupPageInfo(gd::string name, char const* c) {
 

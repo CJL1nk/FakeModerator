@@ -1,12 +1,11 @@
 {
 	"geode": "2.0.0-beta.17",
 	"gd": "2.204",
-	"version": "v1.0.1",
+	"version": "v1.0.2",
 	"id": "cj_link.fakemoderator",
 	"name": "FakeModerator",
 	"developers": [
-		"CJ_Link",
-		"Xanii"
+		"CJ_Link"
 	],
 	"description": "Adds a fake moderator badge and a \"working\" send button",
 	"settings": {
