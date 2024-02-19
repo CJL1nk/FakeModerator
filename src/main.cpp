@@ -5,7 +5,6 @@
 #include <Geode/modify/LevelInfoLayer.hpp>
 #include <Geode/modify/SupportLayer.hpp>
 #include <Geode/modify/GameManager.hpp>
-#include <Geode/binding/LoadingCircle.hpp>
 
 using namespace geode::prelude;
 
