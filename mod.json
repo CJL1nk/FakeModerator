@@ -8,6 +8,7 @@
 		"CJ_Link"
 	],
 	"description": "Adds a fake moderator badge and a \"working\" send button",
+	"repository": "https://github.com/CJL1nk/FakeModerator",
 	"settings": {
 		"mod-type": {
 			"name": "Mod Type",
